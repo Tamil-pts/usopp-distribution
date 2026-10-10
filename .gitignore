@@ -1,0 +1,6 @@
+*.zip
+*.tar
+*.tar.gz
+*.sha256
+.env
+admin-password.txt
