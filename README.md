@@ -28,8 +28,8 @@ accounts/data, follow [Fresh Ubuntu installation](LAN_SERVER.md#8-replace-the-ol
 1. Open **Releases** and download `uSOPp_AI_<version>_Windows_x64.zip`.
 2. Right-click the ZIP, select **Extract all**, and keep the complete extracted folder.
 3. Double-click `Start_uSOPp.cmd`; the browser opens at `http://127.0.0.1:8200`. Direct launch through `uSOPp_AI.exe` also works.
-4. On a fresh installation sign in as **Admin**, password **usopp.2026**, then change it in **Settings → My account**. Existing installations retain their accounts.
-5. Register up to five regular users plus Admin. See the app Help for each workspace.
+4. Click **Explore demo** on the landing page to fill username **demo** and password **demo**, then click **Sign in**. Demo sessions sign out automatically after 30 minutes. Administrative credentials are supplied privately by the server owner.
+5. Register up to five regular users plus Admin. The demo account does not use a regular-user slot. Each demo login gets its own uploads, results and settings. See the app Help for each workspace.
 
 No Python, Node.js, Git or Docker is required. Windows may flag an unsigned EXE; packages are currently unsigned. Accounts, uploads, results and history stay in `%LOCALAPPDATA%\uSOPp.ai`. Finish jobs and use `Stop_uSOPp.cmd` before upgrading. Closing the browser alone does not stop the backend. Keep the data folder; extract each new version into a new application folder.
 

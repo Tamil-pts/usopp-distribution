@@ -48,6 +48,11 @@ Open **http://192.168.19.10:8201**. The installer saves the chosen image, port, 
 
 ## 4. Create users and install the CPU model
 
+Visitors can click **Explore demo** on the landing page to fill `demo` / `demo`
+and then click **Sign in**. Each demo login has its own workspace and a fixed
+30-minute session. Demo access does not consume one of the five regular-user
+slots. Shared rule/mapping changes and administration use personal accounts.
+
 Sign in as Admin. Create up to five regular accounts. Each account keeps its own saved settings, imported metadata and test history. Admin can review everyone's tests.
 
 In **Settings → Chopper · AI connection**, click **Set up small CPU model**. The one-time 1.12 GB download runs in the background, verifies SHA256, selects the included llama.cpp runtime and enables startup on restart. Wait for **Ready**. No Ollama installation is required. Existing browser-only saved settings migrate when their owner signs in to the updated app from that browser.
@@ -119,9 +124,8 @@ settings, mappings, knowledge and rules. It creates new container accounts/data.
 
 ### Download the new release manually
 
-Sign in to GitHub with an account that can read the private
-`<owner>/usopp-distribution` repository. Open **Releases**, select the published
-version and download these four assets:
+Open [Tamil-pts/usopp-distribution Releases](https://github.com/Tamil-pts/usopp-distribution/releases),
+select the published version and download these four assets:
 
 ```text
 uSOPp_AI_<version>_Container_Launchers.zip
@@ -135,6 +139,16 @@ automatic **Source code** ZIP is not the container installer. Obtain all four
 files before removing the old app. If the image asset is absent, the maintainer
 must build the latest source using the package workflow and publish the release
 first; the launcher ZIP alone cannot install the application.
+
+For a direct manual installation before publishing a release, work in
+[Tamil-pts/usopp-ai](https://github.com/Tamil-pts/usopp-ai). Commit/push the
+latest source, open **Actions -> Build private download packages**, select
+**Run workflow** on `main` and leave **Create a draft release** unchecked.
+When both build jobs succeed, download the `release-windows` and
+`release-container` artifacts and extract them. The extracted files include
+the same four container files listed above; transfer those files using the
+following SCP commands. GitHub builds the image even when Docker is absent
+on the development laptop.
 
 To transfer the files from Windows Downloads to the original Ubuntu server,
 open PowerShell and replace the version below with the downloaded version:
