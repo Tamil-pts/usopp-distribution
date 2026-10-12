@@ -1,6 +1,6 @@
 # Shared uSOPp server on LAN/VPN
 
-Release examples below use **4.65.12**. Replace the version with the release you actually download. One server runs the app; five regular users plus Admin use browsers through the existing LAN/VPN. The development laptop remains separate.
+Release examples below use **4.65.13**. Replace the version with the release you actually download. One server runs the app; five regular users plus Admin use browsers through the existing LAN/VPN. The development laptop remains separate.
 
 ## 1. Prepare the server
 
@@ -16,13 +16,13 @@ Only the server needs Docker. User PCs need the browser, VPN and their uSOPp acc
 Open PowerShell in the extracted launcher folder. Verify the image archive against its supplied checksum:
 
 ```powershell
-Get-FileHash .\uSOPp_AI_4.65.12_Container_linux_amd64.tar.gz -Algorithm SHA256
+Get-FileHash .\uSOPp_AI_4.65.13_Container_linux_amd64.tar.gz -Algorithm SHA256
 ```
 
 Use your server's LAN IPv4 address in place of `192.168.19.10`:
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\usopp-container.ps1 install -Image usopp-ai:4.65.12 -ImageArchive .\uSOPp_AI_4.65.12_Container_linux_amd64.tar.gz -Port 8201 -BindAddress 192.168.19.10
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\usopp-container.ps1 install -Image usopp-ai:4.65.13 -ImageArchive .\uSOPp_AI_4.65.13_Container_linux_amd64.tar.gz -Port 8201 -BindAddress 192.168.19.10
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\usopp-container.ps1 status
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\usopp-container.ps1 logs
 ```
@@ -38,8 +38,8 @@ New-NetFirewallRule -DisplayName 'uSOPp LAN VPN' -Direction Inbound -Action Allo
 ## 3. Install on Ubuntu
 
 ```bash
-sha256sum -c uSOPp_AI_4.65.12_Container_linux_amd64.tar.gz.sha256
-USOPP_PORT=8201 USOPP_BIND_ADDRESS=192.168.19.10 bash usopp-container.sh install usopp-ai:4.65.12 ./uSOPp_AI_4.65.12_Container_linux_amd64.tar.gz
+sha256sum -c uSOPp_AI_4.65.13_Container_linux_amd64.tar.gz.sha256
+USOPP_PORT=8201 USOPP_BIND_ADDRESS=192.168.19.10 bash usopp-container.sh install usopp-ai:4.65.13 ./uSOPp_AI_4.65.13_Container_linux_amd64.tar.gz
 bash usopp-container.sh status
 bash usopp-container.sh logs
 ```
@@ -140,15 +140,11 @@ files before removing the old app. If the image asset is absent, the maintainer
 must build the latest source using the package workflow and publish the release
 first; the launcher ZIP alone cannot install the application.
 
-For a direct manual installation before publishing a release, work in
-[Tamil-pts/usopp-ai](https://github.com/Tamil-pts/usopp-ai). Commit/push the
-latest source, open **Actions -> Build private download packages**, select
-**Run workflow** on `main` and leave **Create a draft release** unchecked.
-When both build jobs succeed, download the `release-windows` and
-`release-container` artifacts and extract them. The extracted files include
-the same four container files listed above; transfer those files using the
-following SCP commands. GitHub builds the image even when Docker is absent
-on the development laptop.
+For a direct manual installation before publishing a release, either build
+from the local source bundle on Ubuntu (section 9), or use the source
+repository's **Actions -> Build private download packages** workflow. The
+workflow can build the image even when Docker is absent on the development
+laptop.
 
 To transfer the files from Windows Downloads to the original Ubuntu server,
 open PowerShell and replace the version below with the downloaded version:
@@ -237,3 +233,77 @@ environment is needed on the host.
 
 For subsequent upgrades, use section 6's **update** command to keep the data
 created in this fresh installation.
+
+## 9. Build the container from local source files on Ubuntu
+
+Use this when the release image has not been uploaded yet. It transfers a
+private, reduced build bundle from the development PC, builds the Linux image
+on Ubuntu and installs it locally. It excludes uploaded PLC projects, account
+databases, local model weights, training data, B&R help source files and
+dependency folders. Ubuntu needs Internet access during the Docker build to
+download its pinned base images, packages and llama.cpp source.
+
+On the development Windows PC, from the `usopp_ai_2.0` source folder, create
+the bundle and checksum:
+
+```powershell
+$usoppVersion = (Get-Content .\package.json -Raw | ConvertFrom-Json).version
+$usoppBundle = ".\release\private-build\uSOPp_AI_${usoppVersion}_Container_Build_Source.tar.gz"
+python .\scripts\package_container_build.py --output $usoppBundle
+python .\scripts\package_downloads.py --output ".\release\downloads\$usoppVersion"
+```
+
+Transfer those two files and the matching launcher ZIP/checksum to Ubuntu. For
+version `4.65.13`, the filenames are:
+
+```text
+uSOPp_AI_4.65.13_Container_Build_Source.tar.gz
+uSOPp_AI_4.65.13_Container_Build_Source.tar.gz.sha256
+uSOPp_AI_4.65.13_Container_Launchers.zip
+uSOPp_AI_4.65.13_Container_Launchers.zip.sha256
+```
+
+Run `scp` from Windows PowerShell, replacing `lmw` and the server IP if needed:
+
+```powershell
+$usoppVersion = '4.65.13'
+$usoppSource = ".\release\private-build\uSOPp_AI_${usoppVersion}_Container_Build_Source.tar.gz"
+$usoppLauncher = ".\release\downloads\$usoppVersion\uSOPp_AI_${usoppVersion}_Container_Launchers.zip"
+scp $usoppSource "lmw@192.168.19.10:~/usopp-container/"
+scp "$usoppSource.sha256" "lmw@192.168.19.10:~/usopp-container/"
+scp $usoppLauncher "lmw@192.168.19.10:~/usopp-container/"
+scp "$usoppLauncher.sha256" "lmw@192.168.19.10:~/usopp-container/"
+```
+
+On Ubuntu, verify both checksums, extract the source to its own build folder,
+and build the image. The build takes several minutes and uses the Ubuntu
+server's CPU and network:
+
+```bash
+cd "$HOME/usopp-container"
+usopp_version='4.65.13'
+sha256sum -c "uSOPp_AI_${usopp_version}_Container_Build_Source.tar.gz.sha256"
+sha256sum -c "uSOPp_AI_${usopp_version}_Container_Launchers.zip.sha256"
+mkdir -p "build-${usopp_version}"
+tar -xzf "uSOPp_AI_${usopp_version}_Container_Build_Source.tar.gz" -C "build-${usopp_version}"
+docker build --platform linux/amd64 --build-arg APP_VERSION="$usopp_version" \
+  -t "usopp-ai:$usopp_version" "build-${usopp_version}"
+```
+
+Then install the image already built in Docker. Keep the existing app on port
+8200 untouched; this example uses port 8201:
+
+```bash
+unzip -o "uSOPp_AI_${usopp_version}_Container_Launchers.zip"
+USOPP_PORT=8201 USOPP_BIND_ADDRESS=192.168.19.10 \
+  bash usopp-container.sh install "usopp-ai:$usopp_version"
+bash usopp-container.sh status
+bash usopp-container.sh logs
+```
+
+The Admin password prompt appears during the first container install. Wait for
+`Health: healthy` before opening `http://192.168.19.10:8201`. Once the
+container is running, the temporary build folder and transferred bundle may
+be removed from `~/usopp-container`; keep the launcher ZIP for future
+management commands. Do not remove Docker images or volumes belonging to other
+applications.

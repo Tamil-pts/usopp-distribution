@@ -29,7 +29,7 @@ accounts/data, follow [Fresh Ubuntu installation](LAN_SERVER.md#8-replace-the-ol
 2. Right-click the ZIP, select **Extract all**, and keep the complete extracted folder.
 3. Double-click `Start_uSOPp.cmd`; the browser opens at `http://127.0.0.1:8200`. Direct launch through `uSOPp_AI.exe` also works.
 4. Click **Explore demo** on the landing page to fill username **demo** and password **demo**, then click **Sign in**. Demo sessions sign out automatically after 30 minutes. Administrative credentials are supplied privately by the server owner.
-5. Register up to five regular users plus Admin. The demo account does not use a regular-user slot. Each demo login gets its own uploads, results and settings. See the app Help for each workspace.
+5. New users can request accounts from the sign-in page. Admin enables approved accounts in WorkHub / User management. The server allows five enabled regular users plus Admin; pending requests and the separate demo account do not use active-user slots. Each demo login gets its own uploads, results and settings. See the app Help for each workspace.
 
 No Python, Node.js, Git or Docker is required. Windows may flag an unsigned EXE; packages are currently unsigned. Accounts, uploads, results and history stay in `%LOCALAPPDATA%\uSOPp.ai`. Finish jobs and use `Stop_uSOPp.cmd` before upgrading. Closing the browser alone does not stop the backend. Keep the data folder; extract each new version into a new application folder.
 
